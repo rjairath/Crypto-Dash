@@ -1,4 +1,3 @@
-import CryptoTable from '@/components/CryptoTable';
 import { SiBitcoin } from 'react-icons/si';
 import { FaSearch, FaUser } from 'react-icons/fa';
 import { Input } from '@/components/ui/input';
@@ -8,6 +7,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { CryptoContainer } from '@/components';
 
 const page = () => {
     return (
@@ -40,12 +40,7 @@ const page = () => {
                     </DropdownMenu>
                 </div>
             </header>
-            <main className="p-6">
-                <h1 className="text-2xl font-semibold mb-4">
-                    Top Cryptocurrencies
-                </h1>
-                <CryptoTable />
-            </main>
+            <CryptoContainer />
         </div>
     );
 };

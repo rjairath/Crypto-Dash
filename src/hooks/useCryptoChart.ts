@@ -1,12 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
+import type { ChartQueryParams } from '@/types';
 
-export type ChartParams = {
-    symbol: string;
-    interval: string;
-    limit: number;
-};
 const TTL_SECONDS = 60 * 1000; // 1 min
-const fetchChart = async ({ symbol, interval, limit }: ChartParams) => {
+const fetchChart = async ({ symbol, interval, limit }: ChartQueryParams) => {
     const res = await fetch(
         `/api/chart?symbol=${symbol}&interval=${interval}&limit=${limit}`
     );

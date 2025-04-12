@@ -18,9 +18,15 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import CryptoChart from './CryptoChart';
+import { Button } from '@/components/ui/button';
+import type { CryptoItem, WatchlistItem } from '@/types';
+
+type CryptoTableProps = {
+    addToWatchlist: (item: WatchlistItem) => void;
+};
 
 const limit = 100;
-const CryptoTable = () => {
+export const CryptoTable = ({ addToWatchlist }: CryptoTableProps) => {
     const loaderRef = useRef<HTMLDivElement | null>(null);
     const [selectedSymbol, setSelectedSymbol] = useState<string | null>(null);
     const {
@@ -55,6 +61,19 @@ const CryptoTable = () => {
 
     const flattenedData = data?.pages.flatMap((page) => page.data) || [];
 
+    const addWatchlistHandler = (item: CryptoItem) => {
+        addToWatchlist({
+            id: item.id,
+            name: item.name,
+            symbol: item.symbol,
+            quote: {
+                USD: {
+                    price: item.quote.USD.price,
+                },
+            },
+        });
+    };
+
     return (
         <>
             <Table>
@@ -68,6 +87,7 @@ const CryptoTable = () => {
                         </TableHead>
                         <TableHead className="text-right">Market Cap</TableHead>
                         <TableHead className="text-right">24h %</TableHead>
+                        <TableHead></TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -92,6 +112,19 @@ const CryptoTable = () => {
                             </TableCell>
                             <TableCell className="text-right">
                                 {coin.quote.USD.percent_change_24h.toFixed(2)}%
+                            </TableCell>
+                            <TableCell className="text-right">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="cursor-pointer"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        addWatchlistHandler(coin);
+                                    }}
+                                >
+                                    Add
+                                </Button>
                             </TableCell>
                         </TableRow>
                     ))}
@@ -120,5 +153,3 @@ const CryptoTable = () => {
         </>
     );
 };
-
-export default CryptoTable;
