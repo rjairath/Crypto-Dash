@@ -7,4 +7,8 @@ export type WatchlistItem = {
             price: number;
         };
     };
+    alerts?: {
+        lowerLimit: number;
+        upperLimit: number;
+    };
 };
