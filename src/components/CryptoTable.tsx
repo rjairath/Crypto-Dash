@@ -11,32 +11,20 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import {
-    Sheet,
-    SheetContent,
-    SheetDescription,
-    SheetFooter,
-    SheetHeader,
-    SheetTitle,
-    SheetClose,
-} from '@/components/ui/sheet';
-import { CryptoChart } from './CryptoChart';
-import { Button } from '@/components/ui/button';
 import type { CryptoItem, WatchlistItem } from '@/types';
-import { PriceAlertForm } from './PriceAlertForm';
-import { CryptoSideDrawer } from './CryptoSideDrawer';
+import { FaRegStar, FaStar } from 'react-icons/fa';
 
 type CryptoTableProps = {
-    addToWatchlist: (item: WatchlistItem) => void;
+    watchlist: WatchlistItem[];
+    setSelectedAsset: (asset: CryptoItem | null) => void;
 };
 
 const limit = 100;
-export const CryptoTable = ({ addToWatchlist }: CryptoTableProps) => {
+export const CryptoTable = ({
+    setSelectedAsset,
+    watchlist,
+}: CryptoTableProps) => {
     const loaderRef = useRef<HTMLDivElement | null>(null);
-    const [selectedAsset, setSelectedAsset] = useState<CryptoItem | null>(null);
-    const [alertsValid, setAlertsValid] = useState(false);
-    const [lowerLimit, setLowerLimit] = useState<number | null>(null);
-    const [upperLimit, setUpperLimit] = useState<number | null>(null);
 
     const {
         data,
@@ -70,49 +58,20 @@ export const CryptoTable = ({ addToWatchlist }: CryptoTableProps) => {
 
     const flattenedData = data?.pages.flatMap((page) => page.data) || [];
 
-    const addWatchlistHandler = (item: CryptoItem) => {
-        addToWatchlist({
-            id: item.id,
-            name: item.name,
-            symbol: item.symbol,
-            quote: {
-                USD: {
-                    price: item.quote.USD.price,
-                },
-            },
-            alerts: alertsValid
-                ? {
-                      lowerLimit: lowerLimit!,
-                      upperLimit: upperLimit!,
-                  }
-                : undefined,
-        });
-    };
-
-    const handleAlertsChange = (
-        isValid: boolean,
-        lower: number | null,
-        upper: number | null
-    ) => {
-        setAlertsValid(isValid);
-        setLowerLimit(lower);
-        setUpperLimit(upper);
-    };
-
     return (
         <>
             <Table>
                 <TableHeader>
                     <TableRow>
                         <TableHead>#</TableHead>
-                        <TableHead className="min-w-[60px]">Name</TableHead>
+                        <TableHead className="min-w-[50px]">Name</TableHead>
                         <TableHead>Symbol</TableHead>
                         <TableHead className="text-right">
                             Price (USD)
                         </TableHead>
                         <TableHead className="text-right">Market Cap</TableHead>
                         <TableHead className="text-right">24h %</TableHead>
-                        <TableHead></TableHead>
+                        <TableHead className="text-center"></TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -138,31 +97,23 @@ export const CryptoTable = ({ addToWatchlist }: CryptoTableProps) => {
                             <TableCell className="text-right">
                                 {coin.quote.USD.percent_change_24h.toFixed(2)}%
                             </TableCell>
-                            <TableCell className="text-right">
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    className="cursor-pointer"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        addWatchlistHandler(coin);
-                                    }}
-                                >
-                                    Add
-                                </Button>
+                            <TableCell className="text-center">
+                                {watchlist.some(
+                                    (item) => item.id === coin.id
+                                ) ? (
+                                    <span className="text-amber-600 flex justify-center items-center">
+                                        <FaStar className="w-4 h-4 text-amber-600 text-center" />
+                                    </span>
+                                ) : (
+                                    <span className="text-muted-foreground flex justify-center items-center">
+                                        <FaRegStar className="w-4 h-4 text-center" />
+                                    </span>
+                                )}
                             </TableCell>
                         </TableRow>
                     ))}
                 </TableBody>
             </Table>
-
-            <CryptoSideDrawer
-                selectedAsset={selectedAsset}
-                setSelectedAsset={setSelectedAsset}
-                alertsValid={alertsValid}
-                handleAlertsChange={handleAlertsChange}
-                addWatchlistHandler={addWatchlistHandler}
-            />
 
             <div ref={loaderRef} className="mt-4 text-center">
                 {isFetchingNextPage

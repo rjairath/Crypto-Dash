@@ -8,36 +8,23 @@ import type { CryptoItem } from '@/types';
 
 type PriceAlertFormProps = {
     selectedAsset: CryptoItem | null;
-    onAlertsChange: (
-        isValid: boolean,
-        lowerLimit: number | null,
-        upperLimit: number | null
-    ) => void;
+    lowerLimit: string;
+    setLowerLimit: (value: string) => void;
+    upperLimit: string;
+    setUpperLimit: (value: string) => void;
+    isEditable?: boolean;
 };
 
 export function PriceAlertForm({
     selectedAsset,
-    onAlertsChange,
+    lowerLimit,
+    setLowerLimit,
+    upperLimit,
+    setUpperLimit,
+    isEditable = true,
 }: PriceAlertFormProps) {
-    const [lowerLimit, setLowerLimit] = useState<string>('');
-    const [upperLimit, setUpperLimit] = useState<string>('');
-
-    // Reset form when asset changes
-    useEffect(() => {
-        setLowerLimit('');
-        setUpperLimit('');
-    }, [selectedAsset?.id]);
-
-    // Validate and notify parent component
-    useEffect(() => {
-        const lower = parseFloat(lowerLimit);
-        const upper = parseFloat(upperLimit);
-        const isValid = !isNaN(lower) && !isNaN(upper) && lower < upper;
-
-        onAlertsChange(isValid, isValid ? lower : null, isValid ? upper : null);
-    }, [lowerLimit, upperLimit]);
-
-    // Calculate suggested values based on current price
+    // This should be present, no need for a change here
+    console.log(lowerLimit, upperLimit);
     const suggestedLower = selectedAsset
         ? (selectedAsset.quote.USD.price * 0.9).toFixed(2)
         : '0.00';
@@ -62,6 +49,7 @@ export function PriceAlertForm({
                             value={lowerLimit}
                             onChange={(e) => setLowerLimit(e.target.value)}
                             placeholder={suggestedLower}
+                            disabled={!isEditable}
                         />
                     </div>
                     <div className="space-y-2">
@@ -73,6 +61,7 @@ export function PriceAlertForm({
                             value={upperLimit}
                             onChange={(e) => setUpperLimit(e.target.value)}
                             placeholder={suggestedUpper}
+                            disabled={!isEditable}
                         />
                     </div>
                 </div>

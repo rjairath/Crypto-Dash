@@ -11,27 +11,63 @@ import { CryptoItem } from '@/types/crypto';
 import { CryptoChart } from './CryptoChart';
 import { PriceAlertForm } from './PriceAlertForm';
 import { Button } from '@/components/ui/button';
+import { WatchlistItem } from '@/types';
+import { useState } from 'react';
 
 type CryptoSideDrawerProps = {
     selectedAsset: CryptoItem | null;
     setSelectedAsset: (asset: CryptoItem | null) => void;
-
-    handleAlertsChange: (
-        isValid: boolean,
-        lowerLimit: number | null,
-        upperLimit: number | null
-    ) => void;
-    addWatchlistHandler: (asset: CryptoItem) => void;
-    alertsValid: boolean;
+    addToWatchlist: (item: WatchlistItem) => void;
+    removeFromWatchlist: (item: WatchlistItem) => void;
+    watchlist: WatchlistItem[];
 };
 
 export const CryptoSideDrawer = ({
     selectedAsset,
     setSelectedAsset,
-    alertsValid,
-    handleAlertsChange,
-    addWatchlistHandler,
+    addToWatchlist,
+    removeFromWatchlist,
+    watchlist,
 }: CryptoSideDrawerProps) => {
+    const watchlistItem = selectedAsset
+        ? watchlist.find((item) => item.id === selectedAsset.id)
+        : undefined;
+    const assetInWatchlist = !!watchlistItem;
+
+    const [lowerLimit, setLowerLimit] = useState<string>(
+        watchlistItem?.alerts?.lowerLimit?.toString() || ''
+    );
+    const [upperLimit, setUpperLimit] = useState<string>(
+        watchlistItem?.alerts?.upperLimit?.toString() || ''
+    );
+
+    // check for valid upper and lower limits
+    const alertsValid =
+        isFinite(parseFloat(lowerLimit)) &&
+        isFinite(parseFloat(upperLimit)) &&
+        parseFloat(lowerLimit) <= parseFloat(upperLimit);
+
+    const addWatchlistHandler = (item: CryptoItem) => {
+        if (!alertsValid) {
+            return;
+        }
+
+        addToWatchlist({
+            id: item.id,
+            name: item.name,
+            symbol: item.symbol,
+            quote: {
+                USD: {
+                    price: item.quote.USD.price,
+                },
+            },
+            alerts: {
+                lowerLimit: parseFloat(lowerLimit),
+                upperLimit: parseFloat(upperLimit),
+            },
+        });
+    };
+
     return (
         <Sheet
             open={!!selectedAsset}
@@ -110,20 +146,30 @@ export const CryptoSideDrawer = ({
 
                     <PriceAlertForm
                         selectedAsset={selectedAsset}
-                        onAlertsChange={handleAlertsChange}
+                        lowerLimit={lowerLimit}
+                        setLowerLimit={setLowerLimit}
+                        upperLimit={upperLimit}
+                        setUpperLimit={setUpperLimit}
+                        isEditable={!assetInWatchlist}
                     />
                 </div>
 
                 <SheetFooter className="absolute bottom-0 w-full border-t bg-white dark:bg-gray-950">
                     <Button
                         onClick={() => {
-                            addWatchlistHandler(selectedAsset!!);
+                            if (assetInWatchlist) {
+                                removeFromWatchlist(watchlistItem!);
+                            } else {
+                                addWatchlistHandler(selectedAsset!);
+                            }
                             setSelectedAsset(null);
                         }}
                         variant="default"
                         disabled={!alertsValid}
                     >
-                        Add to Watchlist
+                        {assetInWatchlist
+                            ? 'Remove from Watchlist'
+                            : 'Add to Watchlist'}
                     </Button>
                     <SheetClose asChild>
                         <Button variant="outline">Close</Button>

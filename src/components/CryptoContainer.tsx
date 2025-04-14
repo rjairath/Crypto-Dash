@@ -3,12 +3,14 @@
 import { useState, useEffect } from 'react';
 import { CryptoTable } from './CryptoTable';
 import { CryptoWatchlist } from './CryptoWatchlist';
-import type { WatchlistItem } from '@/types';
+import type { CryptoItem, WatchlistItem } from '@/types';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { toast } from 'sonner';
+import { CryptoSideDrawer } from './CryptoSideDrawer';
 
 export const CryptoContainer = () => {
     const [watchlist, setWatchlist] = useState<WatchlistItem[]>([]);
+    const [selectedAsset, setSelectedAsset] = useState<CryptoItem | null>(null);
 
     useEffect(() => {
         const storedWatchlist = localStorage.getItem('watchlist');
@@ -47,6 +49,7 @@ export const CryptoContainer = () => {
                     <CryptoWatchlist
                         watchlist={watchlist}
                         removeFromWatchlist={removeFromWatchlist}
+                        setSelectedAsset={setSelectedAsset}
                     />
                 </>
             ) : null}
@@ -54,7 +57,20 @@ export const CryptoContainer = () => {
             <h1 className="text-2xl font-semibold mb-4">
                 Top Cryptocurrencies
             </h1>
-            <CryptoTable addToWatchlist={addToWatchlist} />
+            <CryptoTable
+                watchlist={watchlist}
+                setSelectedAsset={setSelectedAsset}
+            />
+
+            {selectedAsset ? (
+                <CryptoSideDrawer
+                    selectedAsset={selectedAsset}
+                    setSelectedAsset={setSelectedAsset}
+                    addToWatchlist={addToWatchlist}
+                    removeFromWatchlist={removeFromWatchlist}
+                    watchlist={watchlist}
+                />
+            ) : null}
         </main>
     );
 };
