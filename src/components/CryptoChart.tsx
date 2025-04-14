@@ -19,7 +19,7 @@ type CryptoChartProps = {
     symbol: string;
 };
 
-export default function CryptoChart({ symbol }: CryptoChartProps) {
+export function CryptoChart({ symbol }: CryptoChartProps) {
     const { data, isLoading, error } = useCryptoChart(symbol);
 
     if (isLoading) return <Skeleton className="h-[300px] w-full" />;
