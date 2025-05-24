@@ -1,45 +1,14 @@
-import { SiBitcoin } from 'react-icons/si';
-import { FaSearch, FaUser } from 'react-icons/fa';
-import { Input } from '@/components/ui/input';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { CryptoContainer } from '@/components';
+import ClientHeader from '@/components/ClientHeader';
+import { createClient } from '@/utils/supabase/server';
 
-const page = () => {
+const page = async () => {
+    const supabase = await createClient();
+    const session = await supabase.auth.getUser();
+
     return (
         <div className="min-h-screen bg-background text-foreground">
-            <header className="flex items-center justify-between px-6 py-4 shadow-md">
-                <div className="flex items-center space-x-2 text-xl font-bold">
-                    <SiBitcoin className="text-yellow-500" size={28} />
-                    <span>CryptoDash</span>
-                </div>
-
-                <div className="flex items-center space-x-4 justify-between">
-                    <div className="relative">
-                        <Input
-                            type="text"
-                            placeholder="Search..."
-                            className="pl-10 pr-4 py-2 w-64"
-                        />
-                        <FaSearch className="absolute left-3 top-2.5 text-muted-foreground" />
-                    </div>
-
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <FaUser />
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                            <DropdownMenuItem>Profile</DropdownMenuItem>
-                            <DropdownMenuItem>Settings</DropdownMenuItem>
-                            <DropdownMenuItem>Logout</DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                </div>
-            </header>
+            <ClientHeader session={session} />
             <CryptoContainer />
         </div>
     );
