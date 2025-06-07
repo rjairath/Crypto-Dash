@@ -9,6 +9,7 @@ import { CryptoSideDrawer } from './CryptoSideDrawer';
 import { LoginModal } from './LoginModal';
 import { useAuth } from '@/hooks/useAuth';
 import { useAlertsQuery } from '@/hooks/useAlertsQuery';
+import { useAddAlertMutation } from '@/hooks/useAddAlertMutation';
 
 export const CryptoContainer = () => {
     const [selectedAsset, setSelectedAsset] = useState<CryptoItem | null>(null);
@@ -16,7 +17,11 @@ export const CryptoContainer = () => {
     const { isLoggedIn } = useAuth();
     const { data: alerts = [] } = useAlertsQuery({
         enabled: isLoggedIn,
-        queryKey: ['alerts', isLoggedIn],
+    });
+    const { mutateAsync: addAlert } = useAddAlertMutation({
+        onSuccess: (item) => {
+            toast(`${item.name} has been added to your watchlist.`);
+        },
     });
 
     const addToWatchlist = async (item: WatchlistItem) => {
@@ -27,29 +32,7 @@ export const CryptoContainer = () => {
             return;
         }
 
-        try {
-            const response = await fetch('/api/add-alert', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    cmc_id: item.id,
-                    name: item.name,
-                    asset_symbol: item.symbol,
-                    upper_limit: item?.alerts?.upperLimit,
-                    lower_limit: item?.alerts?.lowerLimit,
-                }),
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to add alert');
-            }
-
-            toast(`${item.name} has been added to your watchlist.`);
-        } catch (error) {
-            toast.error('Failed to add to watchlist');
-        }
+        await addAlert(item);
     };
 
     const removeFromWatchlist = async (item: Alert) => {};

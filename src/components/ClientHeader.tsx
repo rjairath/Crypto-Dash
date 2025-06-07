@@ -13,6 +13,7 @@ import type { UserResponse } from '@supabase/supabase-js';
 import Image from 'next/image';
 import React from 'react';
 import { LoginModal } from './LoginModal';
+import { useQueryClient } from '@tanstack/react-query';
 
 type ClientHeaderProps = {
     session?: UserResponse;
@@ -23,6 +24,12 @@ const ClientHeader = ({ session }: ClientHeaderProps) => {
     const userMetadata = session?.data?.user?.user_metadata ?? {};
     const { name = '', email = '', avatar_url = '' } = userMetadata;
     const { signOut, isLoggedIn } = useAuth();
+    const queryClient = useQueryClient();
+
+    const handleSignOut = async () => {
+        await signOut();
+        queryClient.invalidateQueries({ queryKey: ['alerts'] });
+    };
 
     return (
         <>
@@ -76,7 +83,7 @@ const ClientHeader = ({ session }: ClientHeaderProps) => {
                                 <DropdownMenuItem>{name}</DropdownMenuItem>
                                 <DropdownMenuItem>{email}</DropdownMenuItem>
                                 <DropdownMenuItem
-                                    onSelect={() => signOut()}
+                                    onSelect={handleSignOut}
                                     className="cursor-pointer"
                                 >
                                     Sign out
