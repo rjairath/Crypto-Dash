@@ -1,76 +1,96 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { CryptoTable } from './CryptoTable';
 import { CryptoWatchlist } from './CryptoWatchlist';
-import type { CryptoItem, WatchlistItem } from '@/types';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import type { Alert, CryptoItem, WatchlistItem } from '@/types';
 import { toast } from 'sonner';
 import { CryptoSideDrawer } from './CryptoSideDrawer';
+import { LoginModal } from './LoginModal';
+import { useAuth } from '@/hooks/useAuth';
+import { useAlertsQuery } from '@/hooks/useAlertsQuery';
 
 export const CryptoContainer = () => {
-    const [watchlist, setWatchlist] = useState<WatchlistItem[]>([]);
     const [selectedAsset, setSelectedAsset] = useState<CryptoItem | null>(null);
+    const [showLoginModal, setShowLoginModal] = useState(false);
+    const { isLoggedIn } = useAuth();
+    const { data: alerts = [] } = useAlertsQuery({
+        enabled: isLoggedIn,
+        queryKey: ['alerts', isLoggedIn],
+    });
 
-    useEffect(() => {
-        const storedWatchlist = localStorage.getItem('watchlist');
-        if (storedWatchlist) {
-            setWatchlist(JSON.parse(storedWatchlist));
-        }
-    }, []);
-
-    const addToWatchlist = (item: WatchlistItem) => {
-        if (watchlist.some((watchlistItem) => watchlistItem.id === item.id)) {
-            toast(`${item.name} is already in your watchlist.`);
+    const addToWatchlist = async (item: WatchlistItem) => {
+        if (!isLoggedIn) {
+            setShowLoginModal(true);
+            setSelectedAsset(null);
+            toast('Please log in to add items to your watchlist.');
             return;
         }
-        const updatedWatchlist = [...watchlist, item];
-        setWatchlist(updatedWatchlist);
-        localStorage.setItem('watchlist', JSON.stringify(updatedWatchlist));
-        toast(`${item.name} has been added to your watchlist.`);
+
+        try {
+            const response = await fetch('/api/add-alert', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    cmc_id: item.id,
+                    name: item.name,
+                    asset_symbol: item.symbol,
+                    upper_limit: item?.alerts?.upperLimit,
+                    lower_limit: item?.alerts?.lowerLimit,
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to add alert');
+            }
+
+            toast(`${item.name} has been added to your watchlist.`);
+        } catch (error) {
+            toast.error('Failed to add to watchlist');
+        }
     };
 
-    const removeFromWatchlist = (item: WatchlistItem) => {
-        const updatedWatchlist = watchlist.filter(
-            (watchlistItem) => watchlistItem.id !== item.id
-        );
-        setWatchlist(updatedWatchlist);
-        localStorage.setItem('watchlist', JSON.stringify(updatedWatchlist));
-        toast(`${item.name} has been removed from your watchlist.`);
-    };
+    const removeFromWatchlist = async (item: Alert) => {};
 
     return (
         <main className="p-6">
-            {watchlist.length ? (
+            {isLoggedIn && alerts.length > 0 && (
                 <>
                     <h1 className="text-2xl font-semibold mb-4">
                         Your watchlist
                     </h1>
                     <CryptoWatchlist
-                        watchlist={watchlist}
+                        watchlist={alerts}
                         removeFromWatchlist={removeFromWatchlist}
                         setSelectedAsset={setSelectedAsset}
                     />
                 </>
-            ) : null}
+            )}
 
             <h1 className="text-2xl font-semibold mb-4">
                 Top Cryptocurrencies
             </h1>
             <CryptoTable
-                watchlist={watchlist}
+                watchlist={alerts}
                 setSelectedAsset={setSelectedAsset}
             />
 
-            {selectedAsset ? (
+            {selectedAsset && (
                 <CryptoSideDrawer
                     selectedAsset={selectedAsset}
                     setSelectedAsset={setSelectedAsset}
                     addToWatchlist={addToWatchlist}
                     removeFromWatchlist={removeFromWatchlist}
-                    watchlist={watchlist}
+                    watchlist={alerts}
                 />
-            ) : null}
+            )}
+
+            <LoginModal
+                showLoginModal={showLoginModal}
+                setShowLoginModal={setShowLoginModal}
+            />
         </main>
     );
 };

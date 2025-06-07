@@ -24,7 +24,6 @@ export function PriceAlertForm({
     isEditable = true,
 }: PriceAlertFormProps) {
     // This should be present, no need for a change here
-    console.log(lowerLimit, upperLimit);
     const suggestedLower = selectedAsset
         ? (selectedAsset.quote.USD.price * 0.9).toFixed(2)
         : '0.00';

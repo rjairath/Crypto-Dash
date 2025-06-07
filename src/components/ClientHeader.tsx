@@ -1,24 +1,18 @@
 'use client';
 import { SiBitcoin } from 'react-icons/si';
-import { FaSearch, FaUser, FaGoogle, FaGithub } from 'react-icons/fa';
+import { FaSearch, FaUser } from 'react-icons/fa';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { signinWithGoogle, signinWithGithub, signOut } from '@/utils/actions';
+import { useAuth } from '@/hooks/useAuth';
 import type { UserResponse } from '@supabase/supabase-js';
 import Image from 'next/image';
 import React from 'react';
+import { LoginModal } from './LoginModal';
 
 type ClientHeaderProps = {
     session?: UserResponse;
@@ -28,6 +22,7 @@ const ClientHeader = ({ session }: ClientHeaderProps) => {
     const [showLoginModal, setShowLoginModal] = React.useState(false);
     const userMetadata = session?.data?.user?.user_metadata ?? {};
     const { name = '', email = '', avatar_url = '' } = userMetadata;
+    const { signOut, isLoggedIn } = useAuth();
 
     return (
         <>
@@ -47,14 +42,15 @@ const ClientHeader = ({ session }: ClientHeaderProps) => {
                         <FaSearch className="absolute left-3 top-2.5 text-muted-foreground" />
                     </div>
 
-                    {!session?.data?.user ? (
+                    {!isLoggedIn ? (
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <FaUser />
+                                <FaUser className="cursor-pointer" />
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
                                 <DropdownMenuItem
                                     onSelect={() => setShowLoginModal(true)}
+                                    className="cursor-pointer"
                                 >
                                     Sign in
                                 </DropdownMenuItem>
@@ -67,8 +63,8 @@ const ClientHeader = ({ session }: ClientHeaderProps) => {
                                     <Image
                                         src={avatar_url}
                                         alt={name}
-                                        width={50}
-                                        height={50}
+                                        width={36}
+                                        height={36}
                                         className="rounded-full cursor-pointer"
                                         quality={100}
                                     />
@@ -79,7 +75,10 @@ const ClientHeader = ({ session }: ClientHeaderProps) => {
                             <DropdownMenuContent align="end">
                                 <DropdownMenuItem>{name}</DropdownMenuItem>
                                 <DropdownMenuItem>{email}</DropdownMenuItem>
-                                <DropdownMenuItem onSelect={() => signOut()}>
+                                <DropdownMenuItem
+                                    onSelect={() => signOut()}
+                                    className="cursor-pointer"
+                                >
                                     Sign out
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
@@ -87,30 +86,10 @@ const ClientHeader = ({ session }: ClientHeaderProps) => {
                     )}
                 </div>
             </header>
-
-            <Dialog open={showLoginModal} onOpenChange={setShowLoginModal}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Sign in to CryptoDash</DialogTitle>
-                    </DialogHeader>
-                    <div className="flex flex-col gap-4 py-4">
-                        <Button
-                            onClick={signinWithGoogle}
-                            variant="outline"
-                            className="flex items-center gap-2"
-                        >
-                            <FaGoogle /> Sign in with Google
-                        </Button>
-                        <Button
-                            onClick={signinWithGithub}
-                            variant="outline"
-                            className="flex items-center gap-2"
-                        >
-                            <FaGithub /> Sign in with GitHub
-                        </Button>
-                    </div>
-                </DialogContent>
-            </Dialog>
+            <LoginModal
+                showLoginModal={showLoginModal}
+                setShowLoginModal={setShowLoginModal}
+            />
         </>
     );
 };

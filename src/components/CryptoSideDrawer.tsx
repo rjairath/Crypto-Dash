@@ -11,15 +11,15 @@ import { CryptoItem } from '@/types/crypto';
 import { CryptoChart } from './CryptoChart';
 import { PriceAlertForm } from './PriceAlertForm';
 import { Button } from '@/components/ui/button';
-import { WatchlistItem } from '@/types';
+import { Alert, WatchlistItem } from '@/types';
 import { useState } from 'react';
 
 type CryptoSideDrawerProps = {
     selectedAsset: CryptoItem | null;
     setSelectedAsset: (asset: CryptoItem | null) => void;
     addToWatchlist: (item: WatchlistItem) => void;
-    removeFromWatchlist: (item: WatchlistItem) => void;
-    watchlist: WatchlistItem[];
+    removeFromWatchlist: (item: Alert) => void;
+    watchlist: Alert[];
 };
 
 export const CryptoSideDrawer = ({
@@ -35,10 +35,10 @@ export const CryptoSideDrawer = ({
     const assetInWatchlist = !!watchlistItem;
 
     const [lowerLimit, setLowerLimit] = useState<string>(
-        watchlistItem?.alerts?.lowerLimit?.toString() || ''
+        watchlistItem?.lower_limit?.toString() || ''
     );
     const [upperLimit, setUpperLimit] = useState<string>(
-        watchlistItem?.alerts?.upperLimit?.toString() || ''
+        watchlistItem?.upper_limit?.toString() || ''
     );
 
     // check for valid upper and lower limits

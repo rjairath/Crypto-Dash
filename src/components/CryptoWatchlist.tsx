@@ -2,12 +2,12 @@
 
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import type { CryptoItem, WatchlistItem } from '@/types';
+import type { CryptoItem, Alert } from '@/types';
 import { FaBell, FaRegTrashAlt } from 'react-icons/fa';
 
 type CryptoWatchlistProps = {
-    watchlist: WatchlistItem[];
-    removeFromWatchlist: (item: WatchlistItem) => void;
+    watchlist: Alert[];
+    removeFromWatchlist: (item: Alert) => void;
     setSelectedAsset: (asset: CryptoItem | null) => void;
 };
 
@@ -31,36 +31,22 @@ export const CryptoWatchlist = ({
     removeFromWatchlist,
     setSelectedAsset,
 }: CryptoWatchlistProps) => {
-    const handleCardClick = (item: WatchlistItem) => {
-        const cryptoItem = {
-            ...item,
-            quote: {
-                USD: {
-                    ...item.quote.USD,
-                    percent_change_24h: 0,
-                    market_cap: 0,
-                },
-            },
-        } as CryptoItem;
-
-        setSelectedAsset(cryptoItem);
-    };
+    const handleCardClick = (item: Alert) => {};
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-4">
             {watchlist.map((item) => {
-                const hasAlerts = item.alerts !== undefined;
-                const currentPrice = item.quote.USD.price;
+                const hasAlerts = item.lower_limit && item.upper_limit;
+                const currentPrice = item.current_price ?? 0;
 
                 // Determine alert status
                 let alertStatus = 'No alerts';
                 let statusColor = 'bg-gray-200';
 
                 if (hasAlerts) {
-                    const { lowerLimit, upperLimit } = item.alerts!;
-                    if (currentPrice < lowerLimit) {
+                    if (currentPrice < item.lower_limit) {
                         alertStatus = 'Below target';
                         statusColor = 'bg-red-500';
-                    } else if (currentPrice > upperLimit) {
+                    } else if (currentPrice > item.upper_limit) {
                         alertStatus = 'Above target';
                         statusColor = 'bg-yellow-500';
                     } else {
@@ -82,7 +68,7 @@ export const CryptoWatchlist = ({
                                         {item.name}
                                     </CardTitle>
                                     <span className="text-xs text-gray-500">
-                                        {item.symbol}
+                                        {item.asset_symbol}
                                     </span>
                                 </div>
                                 <FaRegTrashAlt
@@ -97,7 +83,7 @@ export const CryptoWatchlist = ({
                         <CardContent className="py-2 px-4">
                             <div className="flex justify-between items-center mb-2">
                                 <span className="font-medium">
-                                    ${item.quote.USD.price.toFixed(2)}
+                                    ${item.current_price?.toFixed(2)}
                                 </span>
                                 {hasAlerts && (
                                     <Badge
@@ -131,20 +117,18 @@ export const CryptoWatchlist = ({
                                             style={{
                                                 left: `${calculatePricePosition(
                                                     currentPrice,
-                                                    item.alerts!.lowerLimit,
-                                                    item.alerts!.upperLimit
+                                                    item.lower_limit,
+                                                    item.upper_limit
                                                 )}%`,
                                             }}
                                         />
                                     </div>
                                     <div className="flex justify-between text-xs text-gray-500">
                                         <span>
-                                            $
-                                            {item.alerts!.lowerLimit.toFixed(2)}
+                                            ${item.lower_limit.toFixed(2)}
                                         </span>
                                         <span>
-                                            $
-                                            {item.alerts!.upperLimit.toFixed(2)}
+                                            ${item.upper_limit.toFixed(2)}
                                         </span>
                                     </div>
                                 </div>

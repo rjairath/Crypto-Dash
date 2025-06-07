@@ -11,11 +11,11 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import type { CryptoItem, WatchlistItem } from '@/types';
+import type { Alert, CryptoItem, WatchlistItem } from '@/types';
 import { FaRegStar, FaStar } from 'react-icons/fa';
 
 type CryptoTableProps = {
-    watchlist: WatchlistItem[];
+    watchlist: Alert[];
     setSelectedAsset: (asset: CryptoItem | null) => void;
 };
 
@@ -99,7 +99,7 @@ export const CryptoTable = ({
                             </TableCell>
                             <TableCell className="text-center">
                                 {watchlist.some(
-                                    (item) => item.id === coin.id
+                                    (item) => item.cmc_id === coin.id
                                 ) ? (
                                     <span className="text-amber-600 flex justify-center items-center">
                                         <FaStar className="w-4 h-4 text-amber-600 text-center" />
