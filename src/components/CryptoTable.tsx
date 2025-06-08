@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/table';
 import type { Alert, CryptoItem, WatchlistItem } from '@/types';
 import { FaRegStar, FaStar } from 'react-icons/fa';
+import Image from 'next/image';
 
 type CryptoTableProps = {
     watchlist: Alert[];
@@ -83,7 +84,16 @@ export const CryptoTable = ({
                         >
                             <TableCell>{coin.cmc_rank}</TableCell>
                             <TableCell className="font-medium">
-                                {coin.name}
+                                <div className="flex items-center gap-2">
+                                    <Image
+                                        src={`https://s2.coinmarketcap.com/static/img/coins/64x64/${coin.id}.png`}
+                                        alt={`${coin.name} logo`}
+                                        width={24}
+                                        height={24}
+                                        className="object-contain"
+                                    />
+                                    {coin.name}
+                                </div>
                             </TableCell>
                             <TableCell className="font-medium">
                                 {coin.symbol}
