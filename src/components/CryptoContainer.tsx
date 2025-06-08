@@ -10,6 +10,7 @@ import { LoginModal } from './LoginModal';
 import { useAuth } from '@/hooks/useAuth';
 import { useAlertsQuery } from '@/hooks/useAlertsQuery';
 import { useAddAlertMutation } from '@/hooks/useAddAlertMutation';
+import { useRemoveAlertMutation } from '@/hooks/useRemoveAlertMutation';
 
 export const CryptoContainer = () => {
     const [selectedAsset, setSelectedAsset] = useState<CryptoItem | null>(null);
@@ -18,9 +19,16 @@ export const CryptoContainer = () => {
     const { data: alerts = [] } = useAlertsQuery({
         enabled: isLoggedIn,
     });
+
     const { mutateAsync: addAlert } = useAddAlertMutation({
         onSuccess: (item) => {
             toast(`${item.name} has been added to your watchlist.`);
+        },
+    });
+
+    const { mutateAsync: removeAlertAsync } = useRemoveAlertMutation({
+        onSuccess: (item) => {
+            toast(`${item.name} has been removed from your watchlist.`);
         },
     });
 
@@ -35,7 +43,14 @@ export const CryptoContainer = () => {
         await addAlert(item);
     };
 
-    const removeFromWatchlist = async (item: Alert) => {};
+    const removeFromWatchlist = async (item: Alert) => {
+        if (!isLoggedIn) {
+            toast('You must be logged in to manage your watchlist.');
+            return;
+        }
+
+        await removeAlertAsync(item);
+    };
 
     return (
         <main className="p-6">
