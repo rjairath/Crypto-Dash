@@ -9,6 +9,7 @@ type BinanceSymbolInfo = {
     symbol: string;
     baseAsset: string;
     quoteAsset: string;
+    status: 'TRADING' | 'BREAK';
 };
 
 export async function getBinanceExchangeInfo() {
@@ -32,9 +33,27 @@ export async function getBinanceExchangeInfo() {
 export async function findUSDTMarket(cmcSymbol: string) {
     const info = await getBinanceExchangeInfo();
     const markets = info.symbols as BinanceSymbolInfo[];
+    const normalizedSymbol = cmcSymbol.toUpperCase();
 
-    return markets.find(
+    if (normalizedSymbol === 'USDT') {
+        return 'USDT'; // Special case for USDT itself
+    }
+
+    const exactMatch = markets.find(
         (m) =>
-            m.baseAsset === cmcSymbol.toUpperCase() && m.quoteAsset === 'USDT'
-    )?.symbol;
+            m.baseAsset === normalizedSymbol &&
+            m.quoteAsset === 'USDT' &&
+            m.status === 'TRADING'
+    );
+
+    if (exactMatch) return exactMatch.symbol;
+
+    const fuzzyMatch = markets.find(
+        (m) =>
+            m.symbol.includes(normalizedSymbol) &&
+            m.quoteAsset.endsWith('USDT') &&
+            m.status === 'TRADING'
+    );
+
+    return fuzzyMatch?.symbol;
 }

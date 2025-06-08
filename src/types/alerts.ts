@@ -2,6 +2,7 @@ export type Alert = {
     id: number;
     user_id: string;
     cmc_id: number;
+    cmc_symbol: string;
     name: string;
     asset_symbol: string;
     lower_limit: number;

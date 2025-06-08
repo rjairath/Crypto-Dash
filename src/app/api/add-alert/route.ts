@@ -40,6 +40,7 @@ export async function POST(req: NextRequest) {
                 {
                     user_id: user?.id,
                     cmc_id: parseInt(cmc_id, 10),
+                    cmc_symbol: asset_symbol,
                     name,
                     asset_symbol: market_symbol,
                     upper_limit,

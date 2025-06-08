@@ -30,7 +30,7 @@ export const CryptoSideDrawer = ({
     watchlist,
 }: CryptoSideDrawerProps) => {
     const watchlistItem = selectedAsset
-        ? watchlist.find((item) => item.id === selectedAsset.id)
+        ? watchlist.find((item) => item.cmc_id === selectedAsset.id)
         : undefined;
     const assetInWatchlist = !!watchlistItem;
 
@@ -102,7 +102,7 @@ export const CryptoSideDrawer = ({
                                     </p>
                                     <p className="font-medium">
                                         $
-                                        {selectedAsset.quote.USD.price.toFixed(
+                                        {selectedAsset.quote.USD?.price.toFixed(
                                             2
                                         )}
                                     </p>
@@ -114,15 +114,16 @@ export const CryptoSideDrawer = ({
                                     </p>
                                     <p
                                         className={`font-medium ${
-                                            selectedAsset.quote.USD
-                                                .percent_change_24h >= 0
+                                            (selectedAsset.quote.USD
+                                                ?.percent_change_24h ?? 0) >= 0
                                                 ? 'text-green-600'
                                                 : 'text-red-600'
                                         }`}
                                     >
-                                        {selectedAsset.quote.USD.percent_change_24h.toFixed(
-                                            2
-                                        )}
+                                        {(
+                                            selectedAsset.quote.USD
+                                                ?.percent_change_24h ?? 0
+                                        ).toFixed(2)}
                                         %
                                     </p>
                                 </div>
@@ -134,8 +135,8 @@ export const CryptoSideDrawer = ({
                                     <p className="font-medium">
                                         $
                                         {(
-                                            selectedAsset.quote.USD.market_cap /
-                                            1e9
+                                            (selectedAsset.quote.USD
+                                                ?.market_cap ?? 0) / 1e9
                                         ).toFixed(2)}
                                         B
                                     </p>

@@ -25,11 +25,11 @@ export function PriceAlertForm({
 }: PriceAlertFormProps) {
     // This should be present, no need for a change here
     const suggestedLower = selectedAsset
-        ? (selectedAsset.quote.USD.price * 0.9).toFixed(2)
+        ? ((selectedAsset.quote?.USD?.price ?? 0) * 0.9).toFixed(2)
         : '0.00';
 
     const suggestedUpper = selectedAsset
-        ? (selectedAsset.quote.USD.price * 1.1).toFixed(2)
+        ? ((selectedAsset.quote?.USD?.price ?? 0) * 1.1).toFixed(2)
         : '0.00';
 
     return (

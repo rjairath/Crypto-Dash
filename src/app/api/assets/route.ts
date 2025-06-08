@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import redisClient from '@/lib/redisClient';
 
 const COIN_LIST_KEY = 'crypto:listings:top1000';
-const TTL_SECONDS = 3600; // 60 minutes, will change it to 5 minutes once dev done
+const TTL_SECONDS = 5 * 60; // 5 minutes
 const CMC_LISTING_URL =
     'https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest';
 

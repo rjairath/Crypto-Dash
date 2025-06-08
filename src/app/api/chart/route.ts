@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { findUSDTMarket } from '@/lib/binance';
 import redisClient from '@/lib/redisClient';
 
-const TTL_SECONDS = 60 * 5; // Cache chart data for 5 minutes
+const TTL_SECONDS = 5 * 60; // Cache chart data for 5 minutes
 
 export async function GET(req: NextRequest) {
     try {

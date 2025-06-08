@@ -39,7 +39,6 @@ export const CryptoContainer = () => {
             toast('Please log in to add items to your watchlist.');
             return;
         }
-
         await addAlert(item);
     };
 
@@ -57,12 +56,11 @@ export const CryptoContainer = () => {
             {isLoggedIn && alerts.length > 0 && (
                 <>
                     <h1 className="text-2xl font-semibold mb-4">
-                        Your watchlist
+                        Your Active Alerts
                     </h1>
                     <CryptoWatchlist
                         watchlist={alerts}
                         removeFromWatchlist={removeFromWatchlist}
-                        setSelectedAsset={setSelectedAsset}
                     />
                 </>
             )}

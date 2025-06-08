@@ -1,7 +1,7 @@
 import { useQuery, useInfiniteQuery } from '@tanstack/react-query';
 import type { CryptoListResponse } from '@/types';
 
-const TTL_SECONDS = 60 * 60 * 1000; // 1 hour
+const TTL_SECONDS = 5 * 60 * 1000; // 5 minutes
 const fetchCryptoList = async ({
     page = 1,
     limit = 100,

@@ -8,7 +8,6 @@ import { FaBell, FaRegTrashAlt } from 'react-icons/fa';
 type CryptoWatchlistProps = {
     watchlist: Alert[];
     removeFromWatchlist: (item: Alert) => void;
-    setSelectedAsset: (asset: CryptoItem | null) => void;
 };
 
 const calculatePricePosition = (
@@ -29,7 +28,6 @@ const calculatePricePosition = (
 export const CryptoWatchlist = ({
     watchlist,
     removeFromWatchlist,
-    setSelectedAsset,
 }: CryptoWatchlistProps) => {
     const handleCardClick = (item: Alert) => {};
     return (
@@ -68,7 +66,7 @@ export const CryptoWatchlist = ({
                                         {item.name}
                                     </CardTitle>
                                     <span className="text-xs text-gray-500">
-                                        {item.asset_symbol}
+                                        {item.cmc_symbol}
                                     </span>
                                 </div>
                                 <FaRegTrashAlt
